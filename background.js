@@ -28,14 +28,7 @@ async function playSound() {
   }
 }
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type === "claude-notify-sound-done") {
-    chrome.offscreen.closeDocument().catch(() => {});
-    return;
-  }
-
-  if (message?.type !== "claude-notify") return;
-
+function sendNotification(text, sendResponse) {
   playSound();
 
   chrome.notifications.create(
@@ -43,7 +36,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       type: "basic",
       iconUrl: "icon128.png",
       title: "Claude",
-      message: message.text,
+      message: text,
       priority: 2
     },
     (notificationId) => {
@@ -56,6 +49,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     }
   );
+}
 
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === "claude-notify-sound-done") {
+    chrome.offscreen.closeDocument().catch(() => {});
+    return;
+  }
+
+  if (message?.type === "claude-notify-test") {
+    sendNotification("Notifications are working ✓", sendResponse);
+    return true;
+  }
+
+  if (message?.type !== "claude-notify") return;
+
+  sendNotification(message.text, sendResponse);
   return true; // keep the message channel open for the async sendResponse
 });

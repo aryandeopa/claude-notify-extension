@@ -6,8 +6,12 @@
   "icons": {
     "128": "icon128.png"
   },
-  "permissions": ["notifications", "offscreen"],
+  "permissions": ["notifications", "offscreen", "storage"],
   "host_permissions": ["https://claude.ai/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon128.png"
+  },
   "background": {
     "service_worker": "background.js"
   },

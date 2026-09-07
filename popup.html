@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Claude Notify</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        width: 280px;
+        background: #1c1c1c;
+        color: #f2f0ed;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 16px 10px;
+      }
+      header img {
+        width: 22px;
+        height: 22px;
+      }
+      header h1 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+      }
+      .row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 16px;
+        border-top: 1px solid #2c2c2c;
+      }
+      .row label {
+        font-size: 13px;
+      }
+      .row p {
+        margin: 2px 0 0;
+        font-size: 11px;
+        color: #9a9895;
+      }
+      .switch {
+        display: inline-block;
+        position: relative;
+        width: 36px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: #444;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .slider::before {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        left: 2px;
+        top: 2px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.15s;
+      }
+      input:checked + .slider {
+        background: #da7756;
+      }
+      input:checked + .slider::before {
+        transform: translateX(16px);
+      }
+      .actions {
+        padding: 12px 16px 16px;
+        border-top: 1px solid #2c2c2c;
+      }
+      button#enableNotifBtn {
+        width: 100%;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 8px;
+        background: #da7756;
+        color: white;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      button#enableNotifBtn:hover {
+        background: #c96a4b;
+      }
+      #status {
+        margin-top: 8px;
+        font-size: 11px;
+        color: #9a9895;
+        text-align: center;
+        min-height: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="icon128.png" alt="" />
+      <h1>Claude Notify</h1>
+    </header>
+
+    <div class="row">
+      <div>
+        <label for="questionsToggle">Questions</label>
+        <p>Claude asks a multiple-choice question</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="questionsToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="row">
+      <div>
+        <label for="finishedToggle">Finished responding</label>
+        <p>Claude finishes a normal response</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="finishedToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="actions">
+      <button id="enableNotifBtn">Send a test notification</button>
+      <div id="status"></div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -16,14 +16,21 @@ let wasResponding = false;
 let finishedTimer = null;
 const notifiedDialogs = new WeakSet();
 
-function notify(text) {
-  console.log("[claude-notify] sending:", text);
-  chrome.runtime.sendMessage({ type: "claude-notify", text }, (response) => {
-    if (chrome.runtime.lastError) {
-      console.error("[claude-notify] sendMessage failed:", chrome.runtime.lastError.message);
-    } else {
-      console.log("[claude-notify] background ack:", response);
-    }
+const NOTIFY_DEFAULTS = { notifyQuestions: true, notifyFinished: true };
+
+function notify(text, kind) {
+  chrome.storage.sync.get(NOTIFY_DEFAULTS, (settings) => {
+    if (kind === "question" && !settings.notifyQuestions) return;
+    if (kind === "finished" && !settings.notifyFinished) return;
+
+    console.log("[claude-notify] sending:", text);
+    chrome.runtime.sendMessage({ type: "claude-notify", text }, (response) => {
+      if (chrome.runtime.lastError) {
+        console.error("[claude-notify] sendMessage failed:", chrome.runtime.lastError.message);
+      } else {
+        console.log("[claude-notify] background ack:", response);
+      }
+    });
   });
 }
 
@@ -45,7 +52,12 @@ function checkResponseState() {
       finishedTimer = null;
       if (!document.querySelector(STOP_BUTTON_SELECTOR)) {
         wasResponding = false;
-        notify(describeAskQuestion() || "Claude finished responding");
+        const questionText = describeAskQuestion();
+        if (questionText) {
+          notify(questionText, "question");
+        } else {
+          notify("Claude finished responding", "finished");
+        }
       }
     }, 800);
   }
@@ -61,7 +73,7 @@ function checkForPermissionDialogs(root) {
     const text = dialog.textContent || "";
     if (PERMISSION_KEYWORDS.test(text)) {
       notifiedDialogs.add(dialog);
-      notify("Claude needs your permission to continue");
+      notify("Claude needs your permission to continue", "permission");
     }
   }
 }
