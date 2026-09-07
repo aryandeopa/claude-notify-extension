@@ -3,6 +3,9 @@
   "name": "Claude Notify",
   "version": "1.0.0",
   "description": "Desktop notifications when Claude on claude.ai finishes responding or needs your input.",
+  "icons": {
+    "128": "icon128.png"
+  },
   "permissions": ["notifications"],
   "host_permissions": ["https://claude.ai/*"],
   "background": {
