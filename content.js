@@ -1,13 +1,30 @@
 const STOP_BUTTON_SELECTOR = 'button[aria-label="Stop response"]';
+const ASK_QUESTION_SELECTOR = '[data-cds="AskUserQuestion"]';
 const DIALOG_SELECTOR = '[role="dialog"]';
 const PERMISSION_KEYWORDS = /\ballow\b|\bapprove\b|\bgrant access\b|\bconnect\b/i;
+
+function describeAskQuestion() {
+  const banner = document.querySelector(ASK_QUESTION_SELECTOR);
+  if (!banner) return null;
+  const labelledBy = banner.getAttribute("aria-labelledby");
+  const labelEl = labelledBy && document.getElementById(labelledBy);
+  const text = labelEl?.textContent?.trim();
+  return text ? `Claude is asking: ${text}` : "Claude is asking you a question";
+}
 
 let wasResponding = false;
 let finishedTimer = null;
 const notifiedDialogs = new WeakSet();
 
 function notify(text) {
-  chrome.runtime.sendMessage({ type: "claude-notify", text });
+  console.log("[claude-notify] sending:", text);
+  chrome.runtime.sendMessage({ type: "claude-notify", text }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.error("[claude-notify] sendMessage failed:", chrome.runtime.lastError.message);
+    } else {
+      console.log("[claude-notify] background ack:", response);
+    }
+  });
 }
 
 function checkResponseState() {
@@ -28,7 +45,7 @@ function checkResponseState() {
       finishedTimer = null;
       if (!document.querySelector(STOP_BUTTON_SELECTOR)) {
         wasResponding = false;
-        notify("Claude finished responding");
+        notify(describeAskQuestion() || "Claude finished responding");
       }
     }, 800);
   }
@@ -61,3 +78,4 @@ const observer = new MutationObserver((mutations) => {
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
+console.log("[claude-notify] content script loaded and observing");
